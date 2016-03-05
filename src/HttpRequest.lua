@@ -40,28 +40,20 @@ local function buildPostRequest(host, URI, payload)
 	request = "POST "
 		..URI
 		.." HTTP/1.1\r\n"
-		.."Host: "
-		..host
-		.."\r\n"
+		.."Host: "..host.."\r\n"
 		.."Content-Type: application/json\r\n"
 		.."Connection: close\r\n"
-		.."Content-length: "
-		..string.len(data)
-		.."\r\n\r\n"
-	  	..payload
-	  	.."\r\n"
+		.."Content-length: "..string.len(payload).."\r\n\r\n"
+	  	..payload.."\r\n"
 	return request
 end
 
 local function buildGetRequest(host, URI)
 	request = "GET "
-		..URI
-		.." HTTP/1.1\r\n"
-		.."Host: "
-		..host
-		.."\r\n"
-		.."Accept: */*\r\n"
-		.."User-Agent: Mozilla/4.0 (compatible; esp8266 Lua; Windows NT 5.1)\r\n"
+		..URI.." HTTP/1.1\r\n"
+		.."Host: "..host.."\r\n"
+        .."Authorization: Basic YW1lZXV3OkJpbGxhYm9uZzgwNQ==".."\r\n"
+        .."Cache-Control: no-cache\r\n"
 		.."\r\n"
 	return request
 end
