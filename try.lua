@@ -1,31 +1,13 @@
-function nameHook(commandTable)
-    print("Changing Socket name to:")
-	printTable(commandTable)
-end
+wifi.setmode(wifi.STATION)
+wifi.sta.config("qn_2","drogensindverlogen")
 
-function socketHook(commandTable)
-    print("Set socket to:")
-	if commandTable.socket~=nil then
-		if type(tonumber(commandTable.socket))=="number" then
-			Socket:set(tonumber(commandTable.socket))
-		end
-	end
-end
 
 function wifiHook(commandTable)
-    print("Setting Wifi to:")
 	if (commandTable.ssid~=nil and commandTable.password~=nil) then
+        print("Setting Wifi to:")
+        printTable(commandTable)
 		wifi.sta.config(commandTable.ssid, commandTable.password)
 	end
-end
-
-function buttonPressed()
-	--print("Short Press!")
-    Socket:toggle()
-end
-
-function buttonLongPressed()
-	--print("Long Press!")
 end
 
 function printTable(commandTable)
@@ -36,14 +18,29 @@ end
 
 wifi.setmode(wifi.STATION)
 
--- Init RestAPI module
-RestAPI = require("RestAPI").new(80)
-RestAPI:addHook(socketHook, {'socket'})
---RestAPI:addHook(nameHook, {'soName'})
---RestAPI:addHook(wifiHook, {'ssid','password'})
+Sonoff=require("Sonoff").new()
+Sonoff.RestAPI:addHook(wifiHook,{"ssid","password"})
 
--- Run REST server
-RestAPI:runServer()
+HttpRequest=require("HttpRequest").new()
 
-Socket = require("Socket").new(6)
-Button = require("Button").new(3, buttonPressed, buttonLongPressed)
+state1 = "0"
+state2 = "0"
+Button2 = require("Button").new(4, 
+    -- Switch on/off bed light by short press
+    function()
+        if state2=="0" then
+            state2="1"
+        else
+            state2="0"
+        end
+        HttpRequest:send("GET","192.168.0.183","/?socket="..state2,"") 
+    end,
+    -- Switch on/off shelf light by long press
+    function()
+        if state1=="0" then
+            state1="1"
+        else
+            state1="0"
+        end
+        HttpRequest:send("GET","192.168.0.203","/?socket="..state1,"") 
+    end)

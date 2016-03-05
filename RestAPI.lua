@@ -22,7 +22,6 @@ RestAPI.__index = RestAPI
 
 function RestAPI.new(port)
 	local self = setmetatable({}, RestAPI)
-	
 	self.port = port
 	self.hooks = {}
 	
@@ -35,10 +34,10 @@ function RestAPI.runServer(self)
 		conn:on("receive", function(conn, payload)
 			self.parsePayload(self, conn, payload)
 		end)
-		conn:on("sent", function(conn)
+        conn:on("sent", function(conn)
             print("Closing connection.")
-			conn:close()
-		end)
+            conn:close()
+        end)
 	end)
 end
 
@@ -90,14 +89,14 @@ function RestAPI.parsePayload(self, conn, payload)
 
     ok, json = pcall(cjson.encode, commandTable)
         if ok then
-            --print('Sending JSON:',json)
+            print('Sending JSON:',json)
             conn:send(json)
         else
-            --print("failed to encode!")
+            print("failed to encode!")
             conn:send("{'error':'cjson encode fail'}")
     end
-
-	self.parseCommandTable(self,commandTable)
+    
+    self.parseCommandTable(self,commandTable)
 end
 
 return RestAPI
