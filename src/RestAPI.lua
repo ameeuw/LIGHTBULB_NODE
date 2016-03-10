@@ -72,19 +72,10 @@ function RestAPI.parseCommandTable(self, commandTable)
 end
 
 function RestAPI.parsePayload(self, conn, payload)
-  local commandTable = {}
-    --print(payload)
-    while (payload~="") do
-        if(payload~=nil) then
-            --print('PAYLOAD:',payload)
-            _, key, value, _, payload = payload:match("([%w%p]-)([%w]-)=([%w%p]-)([%s&])([^.]+)")
-        else
-            break
-        end
-        if key~=nil and value~=nil then
-            --print('Key:',key,'Val:',value)
-            commandTable[key] =  value
-        end
+	local commandTable = {}
+	--print(payload)
+    for key, value in string.gfind(payload, "/?%??([^&=]+)=([^&=]+)") do
+        commandTable[key] = value
     end
 
     ok, json = pcall(cjson.encode, commandTable)
