@@ -21,11 +21,22 @@ wifi.setmode(wifi.STATION)
 Sonoff=require("Sonoff").new()
 Sonoff.RestAPI:addHook(wifiHook,{"ssid","password"})
 
-HttpRequest=require("HttpRequest").new()
+Sonoff.RestAPI:addHook(function(commandTable)
+    r = tonumber(commandTable.r)
+    g = tonumber(commandTable.g)
+    b = tonumber(commandTable.b)
+    print("Settings RGB Led to ",r,g,b)
+    gpio.mode(3,gpio.OUTPUT)
+    ws2812.writergb(3, string.char(r,g,b))
+    gpio.mode(3,gpio.INT,gpio.PULLUP)
+    end, {'r','g','b'})
+    
+
+http=require("Http").new()
 
 state1 = "0"
 state2 = "0"
-Button2 = require("Button").new(4, 
+Button2 = require("Button").new(3, 
     -- Switch on/off bed light by short press
     function()
         if state2=="0" then
@@ -33,7 +44,7 @@ Button2 = require("Button").new(4,
         else
             state2="0"
         end
-        HttpRequest:send("GET","192.168.0.183","/?socket="..state2,"") 
+        http.get("192.168.0.183/?socket="..state2, "", function(payload) end) 
     end,
     -- Switch on/off shelf light by long press
     function()
@@ -42,5 +53,5 @@ Button2 = require("Button").new(4,
         else
             state1="0"
         end
-        HttpRequest:send("GET","192.168.0.203","/?socket="..state1,"") 
+        http.get("192.168.0.203/?socket="..state1, "", function(payload) end) 
     end)

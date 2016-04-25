@@ -49,7 +49,7 @@ function Button.checkLongPress(self)
     end)
     tmr.delay(500)
     gpio.mode(self.pin,gpio.INT,gpio.PULLUP)
-    gpio.trig(self.pin,"down",function(level) self.checkLongPress(self) end)
+    gpio.trig(self.pin,"low",function(level) self.checkLongPress(self) end)
 end
 
 

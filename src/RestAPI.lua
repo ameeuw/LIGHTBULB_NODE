@@ -73,8 +73,10 @@ end
 
 function RestAPI.parsePayload(self, conn, payload)
 	local commandTable = {}
-	--print(payload)
-    for key, value in string.gfind(payload, "/?%??([^&=]+)=([^&=]+)") do
+    print('!!PAYLOAD!!\n\n'..payload..'\n\n')
+    method, payload = payload:match("([%w]*) (.*)")
+    --print(method, payload)
+    for key, value in string.gfind(payload, "/?%??([^&= ]+)=([^&= ]+)") do
         commandTable[key] = value
     end
 
