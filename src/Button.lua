@@ -36,10 +36,10 @@ end
 
 -- Check if button was pressed long
 function Button.checkLongPress(self)
-    gpio.mode(self.pin,gpio.OUTPUT)
-    gpio.write(self.pin,gpio.HIGH)
+    gpio.mode(self.pin,gpio.INPUT)
+    --gpio.write(self.pin,gpio.HIGH)
     tmr.alarm(1,500,0,function()
-        if gpio.read(self.pin)~=gpio.HIGH then
+        if gpio.read(self.pin)==gpio.LOW then
         -- long press received
             self.longPressCallback()
         else

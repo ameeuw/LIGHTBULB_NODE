@@ -11,15 +11,11 @@
 local Sonoff = {}
 Sonoff.__index = Sonoff
 
-function Sonoff.new(pin, name, pressCallback, longPressCallback)
+function Sonoff.new(name, pressCallback, longPressCallback)
 	-- TODO: add timer variable to change timer number
 	local self = setmetatable({}, Sonoff)
 	local relayPin = 6
 	local buttonPin = 3
-
-	-- Set name and mDNS service
-	self.name = name
-	mdns.register(name, {hardware='Sonoff', description='GET /?socket=[0~1]' service='http', port=80})
 
 	-- Instantiate new RestAPI
 	self.RestAPI = require("RestAPI").new(80)
@@ -44,6 +40,10 @@ function Sonoff.new(pin, name, pressCallback, longPressCallback)
 
 	-- Add switchable Socket to Sonoff
 	self.Socket = require("Socket").new(relayPin)
+
+    -- Set name and mDNS service
+    self.name = name
+    mdns.register(name, {hardware='ITEAD Sonoff', description='GET /?socket=[0~1]', service='http', port=80})
 
 	return self
 end

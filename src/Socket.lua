@@ -51,11 +51,11 @@ function Socket.off(self)
 end
 
 function Socket.toggle(self)
-    print('[toggle] state:',self.state)
+    --print('[toggle] state:',self.state)
 	if self.state==0 then
-		self.set(self, 1)
+		self.on(self)
 	else
-		self.set(self, 0)
+		self.off(self)
 	end
 end
 

@@ -6,7 +6,7 @@
 --
 -- Initialize:
 -- RestAPI = require('RestAPI').new(port)
--- 
+--
 -- Add action hook:
 -- RestAPI:addHook(callBack, keys)
 --
@@ -24,13 +24,13 @@ function RestAPI.new(port)
 	local self = setmetatable({}, RestAPI)
 	self.port = port
 	self.hooks = {}
-	
+
 	return self
 end
 
 function RestAPI.runServer(self)
-	srv = net.createServer(net.TCP)
-	srv:listen(self.port, function(conn)
+	self.srv = net.createServer(net.TCP)
+	self.srv:listen(self.port, function(conn)
 		conn:on("receive", function(conn, payload)
 			self.parsePayload(self, conn, payload)
 		end)
@@ -39,6 +39,10 @@ function RestAPI.runServer(self)
             conn:close()
         end)
 	end)
+end
+
+function RestAPI.stopServer(self)
+    self.srv:close()
 end
 
 function RestAPI.addHook(self, callBack, keys)
@@ -62,7 +66,7 @@ function RestAPI.parseCommandTable(self, commandTable)
 			   end
 		   end
 		end
-		
+
 		-- If key matches are sufficient
 		if matchcount == table.getn(hook.keys) then
 			-- Call the hook callBack function
@@ -73,7 +77,7 @@ end
 
 function RestAPI.parsePayload(self, conn, payload)
 	local commandTable = {}
-    print('!!PAYLOAD!!\n\n'..payload..'\n\n')
+    --print('!!PAYLOAD!!\n\n'..payload..'\n\n')
     method, payload = payload:match("([%w]*) (.*)")
     --print(method, payload)
     for key, value in string.gfind(payload, "/?%??([^&= ]+)=([^&= ]+)") do
@@ -88,7 +92,7 @@ function RestAPI.parsePayload(self, conn, payload)
             print("failed to encode!")
             conn:send("{'error':'cjson encode fail'}")
     end
-    
+
     self.parseCommandTable(self,commandTable)
 end
 
