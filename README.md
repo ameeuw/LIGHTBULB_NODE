@@ -11,5 +11,20 @@ This is a very early version and will be improved over the next few weeks.
 
 --------------
 
+Required nodeMCU modules (dev branch)
+
+- CJSON
+- enduser_setup
+- file
+- GPIO
+- HTTP
+- mDNS
+- node
+- timer
+- UART
+- WiFi
+
+--------------
+
 The source scripts are meant for use with the nodeMCU lua interpreting firmware. Get the latest firmware from their repository (https://github.com/nodemcu/nodemcu-firmware).
 This code builds on top of revision 0.9.5 of the firmware and does not use floating point operations.
