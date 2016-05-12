@@ -11,7 +11,19 @@ This is a very early version and will be improved over the next few weeks.
 
 --------------
 
-Required nodeMCU modules (dev branch)
+Upload the following scripts to your SonOff using a USB to UART (FT232RL, Silabs cp210x) but _do not forget_ to supply 3.3V to VCC. The cp210x modules [found on Banggood](http://www.banggood.com/search/cp2102.html) can be easily converted ([Instructables Link](http://www.instructables.com/id/Mod-a-USB-to-TTL-Serial-Adapter-CP2102-to-program--1/)) using a linear regulator on the 5V line to support the ESP module.
+I use [ESPlorer](http://esp8266.ru/esplorer/) for uploading, starting and configuring my scripts.
+
+Scripts:
+- init.lua
+- Button.lua
+- RestAPI.lua
+- Socket.lua
+- Sonoff.lua
+
+--------------
+
+Required nodeMCU modules (dev branch) check [nodemcu-build.com](http://nodemcu-build.com)
 
 - CJSON
 - enduser_setup
@@ -26,5 +38,5 @@ Required nodeMCU modules (dev branch)
 
 --------------
 
-The source scripts are meant for use with the nodeMCU lua interpreting firmware. Get the latest firmware from their repository (https://github.com/nodemcu/nodemcu-firmware).
-This code builds on top of revision 0.9.5 of the firmware and does not use floating point operations.
+The source scripts are meant for use with the [nodeMCU](https://github.com/nodemcu/nodemcu-firmware/tree/dev) lua interpreting firmware. Get the latest firmware from their [repository](https://github.com/nodemcu/nodemcu-firmware).
+This code builds on top of revision 1.5.1 of the firmware and does not use floating point operations.
