@@ -25,16 +25,24 @@ Scripts:
 
 Required nodeMCU modules (dev branch) check [nodemcu-build.com](http://nodemcu-build.com)
 
-- CJSON
+- cjson
 - enduser_setup
 - file
-- GPIO
-- HTTP
-- mDNS
+- gpio
+- http
+- mdns
+- net
 - node
-- timer
-- UART
-- WiFi
+- tmr
+- uart
+- wifi
+
+Optionals
+- (adc)
+- (dht)
+- (mqtt)
+- (pwm)
+- (ws2812)
 
 --------------
 
