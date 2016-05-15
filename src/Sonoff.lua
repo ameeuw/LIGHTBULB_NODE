@@ -20,6 +20,7 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 	-- Instantiate new RestAPI
 	self.RestAPI = require("RestAPI").new(80)
 	self.RestAPI:addHook(function(commandTable) self.setHook(self, commandTable) end, {"socket"})
+	self.RestAPI:addHook(function(commandTable) self.telnetHook(self, commandTable) end, {"telnet"})
   -- Run REST server
   self.RestAPI:runServer()
 
@@ -62,6 +63,16 @@ function Sonoff.setHook(self, commandTable)
 		if type(tonumber(commandTable.socket))=="number" then
       print("Set socket to:",tonumber(commandTable.socket))
 			self.Socket:set(tonumber(commandTable.socket))
+		end
+	end
+end
+
+function Sonoff.telnetHook(self, commandTable)
+	if commandTable.telnet~=nil then
+		if type(tonumber(commandTable.telnet))=="number" then
+			print("Starting telnet remote.")
+			self.RestAPI:stopServer()
+			dofile("telnet.lc")
 		end
 	end
 end

@@ -1,9 +1,9 @@
 function checkIP()
     -- Check for IP status
-    tmr.alarm(4,1000, 1, function() 
-            if wifi.sta.getip()==nil then 
+    tmr.alarm(4,1000, 1, function()
+            if wifi.sta.getip()==nil then
                 print("Waiting for IP address...")
-            else 
+            else
                 print("Obtained IP: "..wifi.sta.getip())
                 begin()
                 tmr.stop(4)
@@ -11,7 +11,7 @@ function checkIP()
          end)
 end
 
-if file.open('wifi.lua', 'r') then 
+if file.open('wifi.lua', 'r') then
     dofile('wifi.lua')
     checkIP()
 else
@@ -27,7 +27,7 @@ else
                 writeSettings()
                 checkIP()
             end,
-            
+
             function(err, str)
                 print("enduser_setup: Err #" .. err .. ": " .. str)
             end
@@ -45,12 +45,5 @@ function writeSettings()
 end
 
 function begin()
-    Sonoff = require("Sonoff").new('test', nil, runTelnet)
-end
-
-function runTelnet()
-    print("Stopping TCP Server")
-    Sonoff.RestAPI:stopServer()
-    print("Running Telnet")
-    --dofile('telnet.lua')
+    Sonoff = require("Sonoff").new('bed', nil, nil)
 end
