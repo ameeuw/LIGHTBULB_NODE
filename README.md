@@ -1,4 +1,4 @@
-# ESP8266_SOCKET_NODE
+# ESP8266_SONOFF_NODE
 
 This repository holds the code for a internet connected node. The hardware is based on very cheap in line relay switches called "SonOff" made by and available at ITEAD:
 - [WiFi version](https://www.itead.cc/sonoff-wifi-wireless-switch.html)
