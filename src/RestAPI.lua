@@ -35,7 +35,7 @@ function RestAPI.runServer(self)
 			self.parsePayload(self, conn, payload)
 		end)
         conn:on("sent", function(conn)
-            print("Closing connection.")
+            --print("Closing connection.")
             conn:close()
         end)
 	end)
@@ -79,17 +79,17 @@ function RestAPI.parsePayload(self, conn, payload)
 	local commandTable = {}
     --print('!!PAYLOAD!!\n\n'..payload..'\n\n')
     local req = dofile("httpserver-request.lc")(payload)
-    
-    ok, json = pcall(cjson.encode, req.uri.args)
-        if ok then
-            print('Sending JSON:',json)
-            conn:send(json)
-        else
-            print("failed to encode!")
-            conn:send("{'error':'cjson encode fail'}")
-    end
-    
-    self.parseCommandTable(self,req.uri.args)
+
+		ok, json = pcall(cjson.encode, req.uri.args)
+				if ok and json~="null" then
+						--print('Sending JSON:',json)
+						conn:send(json)
+				else
+						--print("failed to encode!")
+						conn:send("{'error':'cjson encode fail'}")
+		end
+
+    self.parseCommandTable(self, req.uri.args)
 end
 
 return RestAPI

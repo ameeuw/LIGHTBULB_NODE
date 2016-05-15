@@ -60,7 +60,7 @@ end
 function Sonoff.setHook(self, commandTable)
 	if commandTable.socket~=nil then
 		if type(tonumber(commandTable.socket))=="number" then
-            print("Set socket to:",tonumber(commandTable.socket))
+      print("Set socket to:",tonumber(commandTable.socket))
 			self.Socket:set(tonumber(commandTable.socket))
 		end
 	end
