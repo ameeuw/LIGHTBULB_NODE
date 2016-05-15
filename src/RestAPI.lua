@@ -78,13 +78,9 @@ end
 function RestAPI.parsePayload(self, conn, payload)
 	local commandTable = {}
     --print('!!PAYLOAD!!\n\n'..payload..'\n\n')
-    method, payload = payload:match("([%w]*) (.*)")
-    --print(method, payload)
-    for key, value in string.gfind(payload, "/?%??([^&= ]+)=([^&= ]+)") do
-        commandTable[key] = value
-    end
-
-    ok, json = pcall(cjson.encode, commandTable)
+    local req = dofile("httpserver-request.lc")(payload)
+    
+    ok, json = pcall(cjson.encode, req.uri.args)
         if ok then
             print('Sending JSON:',json)
             conn:send(json)
@@ -92,8 +88,8 @@ function RestAPI.parsePayload(self, conn, payload)
             print("failed to encode!")
             conn:send("{'error':'cjson encode fail'}")
     end
-
-    self.parseCommandTable(self,commandTable)
+    
+    self.parseCommandTable(self,req.uri.args)
 end
 
 return RestAPI
