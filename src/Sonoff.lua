@@ -19,8 +19,9 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 
 	-- Instantiate new RestAPI
 	self.RestAPI = require("RestAPI").new(80)
-	self.RestAPI:addHook(function(commandTable) self.setHook(self, commandTable) end, {"socket"})
-	self.RestAPI:addHook(function(commandTable) self.telnetHook(self, commandTable) end, {"telnet"})
+	self.RestAPI:addHook(function(conn, commandTable) self.setHook(self, conn, commandTable) end, {"socket"})
+	self.RestAPI:addHook(function(conn, commandTable) self.telnetHook(self, conn, commandTable) end, {"telnet"})
+	self.RestAPI:addHook(function(conn, commandTable) self.statusHook(self, conn, commandTable) end, {"status"})
   -- Run REST server
   self.RestAPI:runServer()
 
@@ -58,18 +59,40 @@ function Sonoff.buttonLongPress(self)
 	self.longPressCallback()
 end
 
-function Sonoff.setHook(self, commandTable)
+function Sonoff.setHook(self, conn, commandTable)
 	if commandTable.socket~=nil then
 		if type(tonumber(commandTable.socket))=="number" then
       print("Set socket to:",tonumber(commandTable.socket))
 			self.Socket:set(tonumber(commandTable.socket))
+
+			-- local ok, json = pcall(cjson.encode, commandTable)
+			-- 		if ok and json~="null" then
+			-- 				--print('Sending JSON:',json)
+			-- 				conn:send(json)
+			-- 		else
+			-- 				--print("failed to encode!")
+			-- 				conn:send("{'error':'cjson encode fail'}")
+			-- end
+
+			conn:send(self.Socket.state)
+
 		end
 	end
 end
 
-function Sonoff.telnetHook(self, commandTable)
+function Sonoff.telnetHook(self, conn, commandTable)
 	if commandTable.telnet~=nil then
 		if type(tonumber(commandTable.telnet))=="number" then
+
+			local ok, json = pcall(cjson.encode, commandTable)
+					if ok and json~="null" then
+							--print('Sending JSON:',json)
+							conn:send(json)
+					else
+							--print("failed to encode!")
+							conn:send("{'error':'cjson encode fail'}")
+			end
+
 			print("Starting telnet remote.")
 			self.RestAPI:stopServer()
 			dofile("telnet.lc")
@@ -77,5 +100,13 @@ function Sonoff.telnetHook(self, commandTable)
 	end
 end
 
+function Sonoff.statusHook(self, conn, commandTable)
+	if commandTable.status~=nil then
+		if type(tonumber(commandTable.status))=="number" then
+      print("Sending status:",tonumber(self.Socket.state))
+			conn:send(self.Socket.state)
+		end
+	end
+end
 
 return Sonoff

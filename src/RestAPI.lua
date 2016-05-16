@@ -52,7 +52,7 @@ function RestAPI.addHook(self, callBack, keys)
 	table.insert(self.hooks, hook)
 end
 
-function RestAPI.parseCommandTable(self, commandTable)
+function RestAPI.parseCommandTable(self, conn, commandTable)
 	-- Loop of registered hooks
 	for _,hook in pairs(self.hooks) do
 		local matchcount = 0
@@ -70,7 +70,7 @@ function RestAPI.parseCommandTable(self, commandTable)
 		-- If key matches are sufficient
 		if matchcount == table.getn(hook.keys) then
 			-- Call the hook callBack function
-			hook.callBack(commandTable)
+			hook.callBack(conn, commandTable)
 		end
 	end
 end
@@ -80,16 +80,16 @@ function RestAPI.parsePayload(self, conn, payload)
     --print('!!PAYLOAD!!\n\n'..payload..'\n\n')
     local req = dofile("httpserver-request.lc")(payload)
 
-		ok, json = pcall(cjson.encode, req.uri.args)
-				if ok and json~="null" then
-						--print('Sending JSON:',json)
-						conn:send(json)
-				else
-						--print("failed to encode!")
-						conn:send("{'error':'cjson encode fail'}")
-		end
+		-- ok, json = pcall(cjson.encode, req.uri.args)
+		-- 		if ok and json~="null" then
+		-- 				--print('Sending JSON:',json)
+		-- 				conn:send(json)
+		-- 		else
+		-- 				--print("failed to encode!")
+		-- 				conn:send("{'error':'cjson encode fail'}")
+		-- end
 
-    self.parseCommandTable(self, req.uri.args)
+    self.parseCommandTable(self, conn, req.uri.args)
 end
 
 return RestAPI

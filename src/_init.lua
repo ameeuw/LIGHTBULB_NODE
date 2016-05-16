@@ -11,6 +11,19 @@ function checkIP()
          end)
 end
 
+function writeSettings()
+    local ssid, password, _, _ = wifi.sta.getconfig()
+    file.remove("wifi.lua")
+    file.open("wifi.lua", "a+")
+    file.writeline('wifi.setmode(wifi.STATION)')
+    file.writeline('wifi.sta.config("'..ssid..'","'..password..'")')
+    file.close()
+end
+
+function begin()
+    Sonoff = require("Sonoff").new('curtain', nil, nil)
+end
+
 if file.open('wifi.lua', 'r') then
     dofile('wifi.lua')
     checkIP()
@@ -33,17 +46,4 @@ else
             end
         )
     end
-end
-
-function writeSettings()
-    local ssid, password, _, _ = wifi.sta.getconfig()
-    file.remove("wifi.lua")
-    file.open("wifi.lua", "a+")
-    file.writeline('wifi.setmode(wifi.STATION)')
-    file.writeline('wifi.sta.config("'..ssid..'","'..password..'")')
-    file.close()
-end
-
-function begin()
-    Sonoff = require("Sonoff").new('bed', nil, nil)
 end
