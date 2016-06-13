@@ -19,11 +19,34 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 
 	-- Instantiate new RestAPI
 	self.RestAPI = require("RestAPI").new(80)
+	-- Add Hook listeners
 	self.RestAPI:addHook(function(conn, commandTable) self.setHook(self, conn, commandTable) end, {"socket"})
 	self.RestAPI:addHook(function(conn, commandTable) self.telnetHook(self, conn, commandTable) end, {"telnet"})
 	self.RestAPI:addHook(function(conn, commandTable) self.statusHook(self, conn, commandTable) end, {"status"})
   -- Run REST server
   self.RestAPI:runServer()
+
+	-- Instantiate new MQTT client
+	self.MqttClient = mqtt.Client(name, 120, "", "")
+	self.MqttClient:connect("app.b0x.it")
+
+	-- Add listeners
+	self.MqttClient:on("connect", function()
+		self.MqttClient:subscribe("light/set", 0)
+	end)
+
+	-- Add on("message") function to forward incoming topic changes to existing hooks
+	self.MqttClient:on("message", function(client, topic, message)
+		print(message)
+		if (topic == "light/set") and ( (message == "on") or (message =="off") ) then
+			if (message == "on") then
+				self.Socket:set(1)
+			else
+				self.Socket:set(0)
+			end
+			self.MqttClient:publish("light/status", self.Socket.state, 0, 1)
+		end
+	end)
 
 	-- Add Button to Sonoff
 	if pressCallback~=nil then
@@ -52,7 +75,7 @@ end
 
 function Sonoff.buttonPress(self)
 	self.pressCallback()
-	self.Socket:toggle()
+	--self.Socket:toggle()
 end
 
 function Sonoff.buttonLongPress(self)

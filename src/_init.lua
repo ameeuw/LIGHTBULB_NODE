@@ -21,7 +21,7 @@ function writeSettings()
 end
 
 function begin()
-    Sonoff = require("Sonoff").new('curtain', nil, nil)
+    Sonoff = require("Sonoff").new('comfylight', nil, nil)
 end
 
 if file.open('wifi.lua', 'r') then
