@@ -34,7 +34,7 @@ end
 function Socket.set(self, state)
 	-- TODO: add type(state)=="number" verification
     --print('Pin: ',self.pin,'State:',state)
-	gpio.write(self.pin, state)
+	gpio.write(self.pin, (state and 1 or 0))
 	self.state = state
 end
 
@@ -52,7 +52,7 @@ end
 
 function Socket.toggle(self)
     --print('[toggle] state:',self.state)
-	if self.state==0 then
+	if self.state==false then
 		self.on(self)
 	else
 		self.off(self)

@@ -28,25 +28,40 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 
 	-- Instantiate new MQTT client
 	self.MqttClient = mqtt.Client(name, 120, "", "")
-	self.MqttClient:connect("app.b0x.it")
+
+	tmr.alarm(5,1000, 1, function()
+		print("Connecting MQTT")
+		self.MqttClient:connect("app.b0x.it", 3001)
+	end)
 
 	-- Add listeners
 	self.MqttClient:on("connect", function()
 		self.MqttClient:subscribe("light/set", 0)
+		tmr.stop(5)
 	end)
 
 	-- Add on("message") function to forward incoming topic changes to existing hooks
 	self.MqttClient:on("message", function(client, topic, message)
 		print(message)
-		if (topic == "light/set") and ( (message == "on") or (message =="off") ) then
-			if (message == "on") then
-				self.Socket:set(1)
+		if (topic == "light/set") and ( ( (message == "on") or (message =="off") ) or ( (message == "true") or (message =="false") ) ) then
+			if ( (message == "on") or (message == "true") ) then
+				self.Socket:set(true)
 			else
-				self.Socket:set(0)
+				self.Socket:set(false)
 			end
-			self.MqttClient:publish("light/status", self.Socket.state, 0, 1)
+			self.MqttClient:publish("light/status", tostring(self.Socket.state), 0, 1)
 		end
 	end)
+
+	-- Add reconnection on disconnect
+	self.MqttClient:on("offline", function(client)
+		print("Connection lost - reconnecting.")
+		tmr.alarm(5,1000, 1, function()
+			print("...")
+			self.MqttClient:connect("app.b0x.it", 3001)
+		end)
+	end)
+
 
 	-- Add Button to Sonoff
 	if pressCallback~=nil then
