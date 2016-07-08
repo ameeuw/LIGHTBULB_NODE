@@ -1,3 +1,5 @@
+name = 'SocketNode:'..string.sub(wifi.sta.getmac(),13,-1)
+
 function checkIP()
     -- Check for IP status
     tmr.alarm(4,1000, 1, function()
@@ -21,7 +23,7 @@ function writeSettings()
 end
 
 function begin()
-    Sonoff = require("Sonoff").new('comfylight', nil, nil)
+    Sonoff = require("Sonoff").new(name, nil, nil)
 end
 
 if file.open('wifi.lua', 'r') then
@@ -29,9 +31,8 @@ if file.open('wifi.lua', 'r') then
     checkIP()
 else
     if enduser_setup~=nil then
-        local SSID = 'Socket-Node-'..string.sub(wifi.sta.getmac(),13,-1)
         wifi.setmode(wifi.STATIONAP)
-        wifi.ap.config({ssid=SSID, auth=wifi.AUTH_OPEN})
+        wifi.ap.config({ssid=name, auth=wifi.AUTH_OPEN})
         enduser_setup.manual(true)
         print('Starting end user setup..')
         enduser_setup.start(

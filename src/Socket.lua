@@ -6,13 +6,13 @@
 --
 -- Initialize:
 -- Socket = require('Socket').new(pin)
--- 
+--
 -- Set socket state:
 -- Socket:set(state)
 --
 -- Parameters:
 --	state : 0 or 1
--- 
+--
 -- Socket:on()
 -- Socket:off()
 -- Socket:toggle()
@@ -22,12 +22,12 @@ Socket.__index = Socket
 
 function Socket.new(pin)
 	local self = setmetatable({}, Socket)
-	
+
 	self.pin = pin
 	self.state = 0
-	
+
 	gpio.mode(pin, gpio.OUTPUT)
-	
+
 	return self
 end
 
@@ -39,15 +39,15 @@ function Socket.set(self, state)
 end
 
 function Socket.addLed(self, rgbLed)
-	
+
 end
 
 function Socket.on(self)
-	self.set(self, 1)
+	self.set(self, true)
 end
 
 function Socket.off(self)
-	self.set(self, 0)
+	self.set(self, false)
 end
 
 function Socket.toggle(self)

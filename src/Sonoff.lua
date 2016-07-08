@@ -17,6 +17,19 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 	local relayPin = 6
 	local buttonPin = 3
 
+	self.domain = 'burggraben'
+	self.topic = self.domain.."/"..name.."/light/"
+
+	-- Button to SonOff
+	self.Button = require("Button").new(buttonPin, function() self.buttonPress(self) end, function() self.buttonLongPress(self) end)
+
+	-- Add switchable Socket to Sonoff
+	self.Socket = require("Socket").new(relayPin)
+
+		-- Set name and mDNS service
+	self.name = name
+	mdns.register(name, {hardware='ITEAD Sonoff', description='GET /?socket=[0~1]', service='http', port=80})
+
 	-- Instantiate new RestAPI
 	self.RestAPI = require("RestAPI").new(80)
 	-- Add Hook listeners
@@ -31,25 +44,25 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 
 	tmr.alarm(5,1000, 1, function()
 		print("Connecting MQTT")
-		self.MqttClient:connect("app.b0x.it", 3001)
+		self.MqttClient:connect("m-e-e-u-w.de", 62763)
 	end)
 
 	-- Add listeners
 	self.MqttClient:on("connect", function()
-		self.MqttClient:subscribe("light/set", 0)
+		self.MqttClient:subscribe(self.topic.."set", 0)
 		tmr.stop(5)
 	end)
 
 	-- Add on("message") function to forward incoming topic changes to existing hooks
 	self.MqttClient:on("message", function(client, topic, message)
 		print(message)
-		if (topic == "light/set") and ( ( (message == "on") or (message =="off") ) or ( (message == "true") or (message =="false") ) ) then
+		if ( topic == self.topic.."set" ) and ( ( (message == "on") or (message =="off") ) or ( (message == "true") or (message =="false") ) ) then
 			if ( (message == "on") or (message == "true") ) then
 				self.Socket:set(true)
 			else
 				self.Socket:set(false)
 			end
-			self.MqttClient:publish("light/status", tostring(self.Socket.state), 0, 1)
+			self.MqttClient:publish(self.topic.."status", tostring(self.Socket.state), 0, 1)
 		end
 	end)
 
@@ -58,7 +71,7 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 		print("Connection lost - reconnecting.")
 		tmr.alarm(5,1000, 1, function()
 			print("...")
-			self.MqttClient:connect("app.b0x.it", 3001)
+			self.MqttClient:connect("m-e-e-u-w.de", 62763)
 		end)
 	end)
 
@@ -75,22 +88,13 @@ function Sonoff.new(name, pressCallback, longPressCallback)
 	else
 		self.longPressCallback = function() print("Long press!") end
 	end
-
-	self.Button = require("Button").new(buttonPin, function() self.buttonPress(self) end, function() self.buttonLongPress(self) end)
-
-	-- Add switchable Socket to Sonoff
-	self.Socket = require("Socket").new(relayPin)
-
-    -- Set name and mDNS service
-    self.name = name
-    mdns.register(name, {hardware='ITEAD Sonoff', description='GET /?socket=[0~1]', service='http', port=80})
-
 	return self
 end
 
 function Sonoff.buttonPress(self)
 	self.pressCallback()
-	--self.Socket:toggle()
+	self.MqttClient:publish(self.topic.."status", tostring(self.Socket.state), 0, 1)
+	self.Socket:toggle()
 end
 
 function Sonoff.buttonLongPress(self)
